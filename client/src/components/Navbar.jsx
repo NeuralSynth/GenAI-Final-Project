@@ -7,11 +7,13 @@
 
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShieldAlert, LayoutDashboard, UploadCloud, FileText, Settings, MessageSquare, LogOut, User as UserIcon } from 'lucide-react';
+import { ShieldAlert, LayoutDashboard, UploadCloud, FileText, Settings, MessageSquare, LogOut, User as UserIcon, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { isDark, toggle } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -103,7 +105,19 @@ const Navbar = () => {
             )}
 
             {user ? (
-              <div className="flex items-center gap-3 pl-3 border-l border-hairline">
+              <div className="flex items-center gap-2 pl-3 border-l border-hairline">
+                {/* Dark Mode Toggle */}
+                <button
+                  onClick={toggle}
+                  className="btn-theme-toggle"
+                  title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                  aria-label="Toggle dark mode"
+                >
+                  {isDark
+                    ? <Sun className="w-4 h-4" />
+                    : <Moon className="w-4 h-4" />}
+                </button>
+
                 <div className="hidden lg:flex flex-col text-right">
                   <span className="text-xs font-semibold text-ink">{user.username}</span>
                   <span className="text-[9px] text-primary font-semibold uppercase tracking-wider">{user.role}</span>
@@ -118,13 +132,20 @@ const Navbar = () => {
                 </button>
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="btn-primary"
-              >
-                <UserIcon className="w-3.5 h-3.5" />
-                Sign In
-              </Link>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={toggle}
+                  className="btn-theme-toggle"
+                  title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                  aria-label="Toggle dark mode"
+                >
+                  {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </button>
+                <Link to="/login" className="btn-primary">
+                  <UserIcon className="w-3.5 h-3.5" />
+                  Sign In
+                </Link>
+              </div>
             )}
           </div>
 

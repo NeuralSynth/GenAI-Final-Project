@@ -4,112 +4,178 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;650&display=swap');
 
-/* Tailwind v4 Custom Theme Extension */
+/* =========================================================================
+   LIGHT MODE — Warm Cream Canvas Tokens
+   ========================================================================= */
 @theme {
-  /* Warm-Editorial Color Palette */
-  --color-canvas: #faf9f5;
-  --color-surface-soft: #f5f0e8;
-  --color-surface-card: #efe9de;
+  --color-canvas:               #faf9f5;
+  --color-surface-soft:         #f5f0e8;
+  --color-surface-card:         #efe9de;
   --color-surface-cream-strong: #e8e0d2;
-  --color-surface-dark: #181715;
-  --color-surface-dark-elevated: #252320;
-  --color-surface-dark-soft: #1f1e1b;
-  
-  --color-primary: #cc785c;
-  --color-primary-active: #a9583e;
-  --color-primary-disabled: #e6dfd8;
-  
-  --color-ink: #141413;
-  --color-body-strong: #252523;
-  --color-body: #3d3d3a;
-  --color-muted: #6c6a64;
-  --color-muted-soft: #8e8b82;
-  --color-hairline: #e6dfd8;
-  --color-hairline-soft: #ebe6df;
-  
-  --color-success: #5db872;
-  --color-warning: #d4a017;
-  --color-error: #c64545;
+  --color-surface-dark:         #181715;
+  --color-surface-dark-elevated:#252320;
+  --color-surface-dark-soft:    #1f1e1b;
 
-  /* Typography Fonts */
+  --color-primary:              #cc785c;
+  --color-primary-active:       #a9583e;
+  --color-primary-disabled:     #e6dfd8;
+
+  --color-ink:                  #141413;
+  --color-body-strong:          #252523;
+  --color-body:                 #3d3d3a;
+  --color-muted:                #6c6a64;
+  --color-muted-soft:           #8e8b82;
+  --color-hairline:             #e6dfd8;
+  --color-hairline-soft:        #ebe6df;
+
+  --color-success:              #5db872;
+  --color-warning:              #d4a017;
+  --color-error:                #c64545;
+
   --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans:  'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:  'JetBrains Mono', monospace;
+}
+
+/* =========================================================================
+   DARK MODE — Overrides via html.dark CSS custom properties
+   ========================================================================= */
+html.dark {
+  --color-canvas:               #1a1917;
+  --color-surface-soft:         #201f1c;
+  --color-surface-card:         #252320;
+  --color-surface-cream-strong: #2c2a26;
+
+  --color-primary:              #d4896a;
+  --color-primary-active:       #e09a7d;
+  --color-primary-disabled:     #3a3632;
+
+  --color-ink:                  #f0ede6;
+  --color-body-strong:          #ddd9d0;
+  --color-body:                 #c4bfb5;
+  --color-muted:                #8a8680;
+  --color-muted-soft:           #6b6761;
+  --color-hairline:             #2e2c28;
+  --color-hairline-soft:        #363330;
+
+  --color-success:              #6dcc82;
+  --color-warning:              #e0b030;
+  --color-error:                #d95f5f;
 }
 
 @layer base {
-  body {
-    @apply bg-canvas text-body antialiased font-sans selection:bg-primary/20 selection:text-ink;
+  html {
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
-  
+
+  body {
+    @apply bg-canvas text-body antialiased font-sans;
+    selection-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+
   h1, h2, h3, h4 {
     @apply font-serif text-ink tracking-tight font-medium;
   }
 }
 
 /* =========================================================================
-   Premium Custom UI Components (Warm Editorial Theme)
+   Premium Custom UI Components — auto-adapt to dark/light via CSS vars
    ========================================================================= */
 @layer components {
-  /* Warm editorial cream content card */
+
   .glass-card {
-    @apply bg-surface-card border border-hairline rounded-xl shadow-sm transition-all duration-300;
-  }
-  
-  .glass-card-hover {
-    @apply hover:bg-surface-cream-strong hover:shadow-md hover:-translate-y-0.5;
+    background-color: var(--color-surface-card);
+    border: 1px solid var(--color-hairline);
+    @apply rounded-xl shadow-sm transition-all duration-300;
   }
 
-  /* Dark navy mockup card */
+  .glass-card-hover {
+    @apply hover:shadow-md hover:-translate-y-0.5;
+  }
+  .glass-card-hover:hover {
+    background-color: var(--color-surface-cream-strong);
+  }
+
   .dark-card {
     @apply bg-surface-dark border border-surface-dark-elevated text-white rounded-xl shadow-md p-6;
   }
 
-  /* Sleek modern inputs */
   .glass-input {
-    @apply w-full bg-canvas border border-hairline rounded-lg px-3 py-2 text-xs text-ink placeholder-muted focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all duration-200;
+    background-color: var(--color-canvas);
+    border: 1px solid var(--color-hairline);
+    color: var(--color-ink);
+    @apply w-full rounded-lg px-3 py-2 text-xs placeholder-muted focus:outline-none transition-all duration-200;
+  }
+  .glass-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+  .glass-input::placeholder {
+    color: var(--color-muted);
   }
 
-  /* Signature Coral Buttons */
   .btn-primary {
-    @apply bg-primary hover:bg-primary-active text-white font-semibold px-4 py-2 rounded-lg shadow-sm active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 text-xs cursor-pointer;
+    background-color: var(--color-primary);
+    @apply text-white font-semibold px-4 py-2 rounded-lg shadow-sm active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 text-xs cursor-pointer;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-primary-active);
   }
 
-  /* Secondary outline button style */
   .btn-secondary {
-    @apply bg-canvas hover:bg-surface-soft text-ink border border-hairline font-semibold px-4 py-2 rounded-lg active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 text-xs cursor-pointer;
+    background-color: var(--color-canvas);
+    border: 1px solid var(--color-hairline);
+    color: var(--color-ink);
+    @apply font-semibold px-4 py-2 rounded-lg active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 text-xs cursor-pointer;
+  }
+  .btn-secondary:hover {
+    background-color: var(--color-surface-soft);
   }
 
-  /* Secondary button for dark containers */
   .btn-secondary-dark {
     @apply bg-surface-dark-elevated hover:bg-surface-dark-soft text-white border border-surface-dark-soft font-semibold px-4 py-2 rounded-lg active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 text-xs cursor-pointer;
   }
 
-  /* Danger Red Button */
   .btn-danger {
     @apply bg-error hover:opacity-90 text-white font-semibold px-4 py-2 rounded-lg active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-1.5 text-xs cursor-pointer;
   }
+
+  /* Theme-aware toggle button */
+  .btn-theme-toggle {
+    background-color: var(--color-surface-soft);
+    border: 1px solid var(--color-hairline);
+    color: var(--color-muted);
+    @apply p-2 rounded-lg transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95;
+  }
+  .btn-theme-toggle:hover {
+    color: var(--color-ink);
+    background-color: var(--color-surface-card);
+  }
 }
 
-/* Scrollbar Tweaks */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+/* =========================================================================
+   Scrollbar — adapts to theme
+   ========================================================================= */
+::-webkit-scrollbar { width: 6px; height: 6px; }
 
 ::-webkit-scrollbar-track {
-  @apply bg-canvas;
+  background: var(--color-canvas);
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-hairline rounded-full hover:bg-surface-cream-strong transition-colors;
+  background: var(--color-hairline);
+  border-radius: 9999px;
 }
 
-/* Dark scrollbars */
-.dark-scroll::-webkit-scrollbar-track {
-  @apply bg-surface-dark;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-cream-strong);
 }
 
-.dark-scroll::-webkit-scrollbar-thumb {
-  @apply bg-surface-dark-elevated rounded-full hover:bg-surface-dark-soft transition-colors;
+/* =========================================================================
+   Utility: smooth theme transition on all elements
+   ========================================================================= */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
 }
