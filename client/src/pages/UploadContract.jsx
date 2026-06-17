@@ -199,22 +199,6 @@ const UploadContract = () => {
           </div>
         )}
 
-        {/* Quick Help Guide */}
-        <div className="bg-navy-950/60 border border-navy-850 p-5 rounded-xl space-y-3">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Testing & Demonstration Tips</h4>
-          <p className="text-xs text-slate-400">
-            For easy testing, we have pre-generated three distinct sample contracts containing typical clauses and risk situations.
-          </p>
-          <div className="text-xs bg-navy-900/60 p-3 rounded-lg border border-navy-800 space-y-1.5 text-slate-300">
-            <p className="font-semibold text-blue-500">To find these files:</p>
-            <p className="font-mono text-slate-400 select-all">/Users/mdkaif/Desktop/GenAIFinalProject/sample-contracts/</p>
-            <ul className="list-disc list-inside space-y-1 pl-1 mt-1 text-[11px] text-slate-400">
-              <li><span className="font-semibold text-slate-300">Standard_SaaS_Agreement.pdf</span> - Low risk, standard Net 30 payment</li>
-              <li><span className="font-semibold text-slate-300">Risky_Vendor_Contract.pdf</span> - High risk, Net 90, uncapped liability</li>
-              <li><span className="font-semibold text-slate-300">Service_Agreement_Foreign_Jurisdiction.pdf</span> - Medium risk, Swiss law, 60-day notice</li>
-            </ul>
-          </div>
-        </div>
 
       </div>
     </div>
