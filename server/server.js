@@ -18,6 +18,7 @@ const authRoutes = require('./routes/authRoutes');
 const { protect, authorize } = require('./middleware/auth');
 const errorHandler = require('./middleware/errorHandler');
 const { checkNeo4jStatus } = require('./services/neo4jService');
+const { isGeminiEnabled } = require('./config/aiConfig');
 const Contract = require('./models/Contract');
 
 // 1. Initialize Express App
@@ -45,7 +46,7 @@ app.use('/api/chat', protect, chatRoutes);
 
 // 6. Admin API (Special Utility Endpoints for Viva Demonstrations)
 app.get('/api/admin/status', protect, (req, res) => {
-  const isGeminiActive = !!(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim() !== '' && process.env.GEMINI_API_KEY !== 'your_gemini_api_key_here');
+  const isGeminiActive = isGeminiEnabled;
   const neo4jStatus = checkNeo4jStatus();
 
   return res.status(200).json({

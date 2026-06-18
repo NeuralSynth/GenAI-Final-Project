@@ -9,20 +9,10 @@
 // gracefully falls back to a regex-based mock analyser. This guarantees that 
 // students can run successful offline demonstrations without crashing.
 
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const fs = require('fs');
-const path = require('path');
+const { getGeminiClient, CHAT_MODEL, MAX_ANALYSIS_CHARS, MAX_SUMMARY_CHARS } = require('../config/aiConfig');
 
-// Initialize Gemini SDK if API Key is available
-const apiKey = process.env.GEMINI_API_KEY;
-let genAI = null;
-
-if (apiKey && apiKey.trim() !== '' && apiKey !== 'your_gemini_api_key_here') {
-  genAI = new GoogleGenerativeAI(apiKey);
-  console.log('[AI Service] Gemini API initialized successfully.');
-} else {
-  console.warn('[AI Service Warning] GEMINI_API_KEY is missing or placeholder. Running in MOCK Mode.');
-}
+// Shared Gemini client (null in offline/mock mode) — config is centralized in aiConfig.
+const genAI = getGeminiClient();
 
 /**
  * Clean response text by removing potential markdown wrapping blocks: ```json ... ```
@@ -49,11 +39,11 @@ const analyzeContractText = async (rawText) => {
   // If API key is available, run the actual Gemini analysis
   if (genAI) {
     try {
-      const model = genAI.getGenerativeModel({ 
-        model: 'gemini-2.5-flash',
+      const model = genAI.getGenerativeModel({
+        model: CHAT_MODEL,
         generationConfig: { responseMimeType: "application/json" }
       });
-      
+
       const prompt = `
         You are an elite legal AI contracts analyst. Read the following contract text.
         Extract all major legal clauses belonging to these categories:
@@ -104,7 +94,7 @@ const analyzeContractText = async (rawText) => {
         ]
 
         Contract Text:
-        ${rawText.substring(0, 40000)} // Truncated to fit within model constraints if huge
+        ${rawText.substring(0, MAX_ANALYSIS_CHARS)} // Truncated to fit within model constraints if huge
       `;
 
       const result = await model.generateContent(prompt);
@@ -130,8 +120,8 @@ const analyzeContractText = async (rawText) => {
 const generateExecutiveSummary = async (rawText, clauses) => {
   if (genAI) {
     try {
-      const model = genAI.getGenerativeModel({ 
-        model: 'gemini-2.5-flash',
+      const model = genAI.getGenerativeModel({
+        model: CHAT_MODEL,
         generationConfig: { responseMimeType: "application/json" }
       });
 
@@ -160,7 +150,7 @@ const generateExecutiveSummary = async (rawText, clauses) => {
         ${JSON.stringify(clauses)}
 
         Contract text snippet:
-        ${rawText.substring(0, 15000)}
+        ${rawText.substring(0, MAX_SUMMARY_CHARS)}
       `;
 
       const result = await model.generateContent(prompt);

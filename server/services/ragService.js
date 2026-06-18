@@ -12,24 +12,16 @@
 //    cosine similarity to find the most relevant chunks in memory.
 // 4. Augmentation: We feed the relevant chunks into the Gemini prompt as context to answer.
 
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const {
+  getGeminiClient,
+  EMBEDDING_MODEL,
+  CHUNK_SIZE,
+  CHUNK_OVERLAP,
+  MAX_DOC_BYTES
+} = require('../config/aiConfig');
 
-// Initialize Gemini if key is provided
-const apiKey = process.env.GEMINI_API_KEY;
-let genAI = null;
-if (apiKey && apiKey.trim() !== '' && apiKey !== 'your_gemini_api_key_here') {
-  genAI = new GoogleGenerativeAI(apiKey);
-}
-
-// Embedding configuration. Kept as constants so generation and retrieval always
-// agree, and so a stored cache can be validated against the current model.
-const EMBEDDING_MODEL = 'text-embedding-004';
-const CHUNK_SIZE = 800;
-const CHUNK_OVERLAP = 200;
-
-// MongoDB caps a single document at 16MB. We stay under a 15MB safety threshold
-// (leaving headroom for rawText, clauses, and BSON overhead) before caching vectors.
-const MAX_DOC_BYTES = 15 * 1024 * 1024;
+// Shared Gemini client (null in offline/mock mode) — config centralized in aiConfig.
+const genAI = getGeminiClient();
 
 /**
  * Splits a long text string into smaller chunks with overlapping text.
