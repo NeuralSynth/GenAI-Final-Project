@@ -8,6 +8,7 @@ const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../errors/AppError');
+const { serializeUser } = require('../dto/userDTO');
 
 // Helper to sign JWT tokens
 const generateToken = (id) => {
@@ -38,11 +39,7 @@ router.post('/register', asyncHandler(async (req, res) => {
 
   const token = generateToken(user._id);
 
-  return res.status(201).json({
-    success: true,
-    token,
-    user: { id: user._id, username: user.username, email: user.email, role: user.role }
-  });
+  return res.status(201).json({ success: true, token, user: serializeUser(user) });
 }));
 
 // @desc    Authenticate user & get token
@@ -68,11 +65,7 @@ router.post('/login', asyncHandler(async (req, res) => {
 
   const token = generateToken(user._id);
 
-  return res.status(200).json({
-    success: true,
-    token,
-    user: { id: user._id, username: user.username, email: user.email, role: user.role }
-  });
+  return res.status(200).json({ success: true, token, user: serializeUser(user) });
 }));
 
 // @desc    Get current logged in user profile
@@ -80,10 +73,7 @@ router.post('/login', asyncHandler(async (req, res) => {
 // @access  Private
 router.get('/me', protect, asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id);
-  return res.status(200).json({
-    success: true,
-    user: { id: user._id, username: user.username, email: user.email, role: user.role }
-  });
+  return res.status(200).json({ success: true, user: serializeUser(user) });
 }));
 
 module.exports = router;

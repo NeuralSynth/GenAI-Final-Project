@@ -17,7 +17,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const authRoutes = require('./routes/authRoutes');
 const { protect, authorize } = require('./middleware/auth');
 const errorHandler = require('./middleware/errorHandler');
-const { checkNeo4jStatus } = require('./services/neo4jService');
+const { checkNeo4jStatus, initNeo4j, purgeAll } = require('./services/neo4jService');
 const { isGeminiEnabled } = require('./config/aiConfig');
 const asyncHandler = require('./middleware/asyncHandler');
 const Contract = require('./models/Contract');
@@ -26,8 +26,9 @@ const Contract = require('./models/Contract');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 2. Connect to MongoDB
+// 2. Connect to MongoDB and initialize the Neo4j graph connection
 connectDB();
+initNeo4j();
 
 // 3. Setup Global Middleware
 app.use(cors()); // CORS allows frontend applications hosted on separate ports (like Vite on 5173) to communicate with this API
@@ -65,18 +66,8 @@ app.post('/api/admin/reset-db', protect, authorize('admin'), asyncHandler(async 
   const result = await Contract.deleteMany({});
   console.warn('[Admin] Reset database requested. All contracts purged.');
 
-  // Attempt Neo4j complete purge if active
-  const { checkNeo4jStatus } = require('./services/neo4jService');
-  const neo4jStatus = checkNeo4jStatus();
-  if (neo4jStatus.isConnected) {
-    const neo4j = require('neo4j-driver');
-    const driver = neo4j.driver(process.env.NEO4J_URI, neo4j.auth.basic(process.env.NEO4J_USERNAME, process.env.NEO4J_PASSWORD));
-    const session = driver.session();
-    await session.run('MATCH (n) DETACH DELETE n');
-    await session.close();
-    await driver.close();
-    console.warn('[Admin] Neo4j database graph purged.');
-  }
+  // Encapsulated graph purge (no-op if Neo4j is offline).
+  await purgeAll();
 
   return res.status(200).json({
     success: true,

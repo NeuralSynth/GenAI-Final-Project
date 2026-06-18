@@ -11,6 +11,7 @@ const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../errors/AppError');
 const { ingestContract } = require('../services/contractIngestionService');
 const { deleteContractFromGraph, getContractGraphData } = require('../services/neo4jService');
+const { serializeContractDetail, serializeContractList } = require('../dto/contractDTO');
 
 /** Best-effort removal of the multer temp file. */
 const cleanupTempFile = (filePath) => {
@@ -58,7 +59,11 @@ const getAllContracts = asyncHandler(async (req, res) => {
     .select('title uploadedAt overallRiskScore extractedClauses.clauseType')
     .sort({ uploadedAt: -1 });
 
-  return res.status(200).json({ success: true, count: contracts.length, contracts });
+  return res.status(200).json({
+    success: true,
+    count: contracts.length,
+    contracts: serializeContractList(contracts)
+  });
 });
 
 /**
@@ -70,8 +75,12 @@ const getContractById = asyncHandler(async (req, res) => {
     throw new AppError('Contract not found.', 404);
   }
 
-  const graphData = await getContractGraphData(contract);
-  return res.status(200).json({ success: true, contract, graphData });
+  const graphData = getContractGraphData(contract);
+  return res.status(200).json({
+    success: true,
+    contract: serializeContractDetail(contract),
+    graphData
+  });
 });
 
 /**
