@@ -17,6 +17,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getContractById } from '../services/api';
 import GraphVisualizer from '../components/GraphVisualizer';
 import { RiskScoreBadge, MarketStatusBadge } from '../components/RiskBadge';
+import { getSampleAnalysisHistory, contributors } from '../data/contributorsMock';
 import { 
   FileText, 
   ShieldAlert, 
@@ -28,7 +29,8 @@ import {
   Layers, 
   ChevronRight,
   TrendingUp,
-  Scale
+  Scale,
+  CheckCircle2
 } from 'lucide-react';
 
 const ContractDetails = () => {
@@ -177,6 +179,10 @@ const ContractDetails = () => {
             <div className="space-y-3">
               {clauses.map((clause, idx) => {
                 const isHighlighted = highlightedClauseType === clause.clauseType;
+                // Assign consistent analyst based on clause index
+                const analystIndex = idx % contributors.length;
+                const assignedAnalyst = contributors[analystIndex];
+                
                 return (
                   <div
                     key={clause._id || idx}
@@ -221,6 +227,17 @@ const ContractDetails = () => {
                         <p className="text-slate-300 leading-normal text-[11px]">
                           {clause.marketComparisonReason || 'This clause aligns with average standards and presents no atypical deviations.'}
                         </p>
+                      </div>
+                    </div>
+
+                    {/* Analyst Attribution Footer */}
+                    <div className="pt-2 border-t border-navy-800/50 flex items-center justify-between">
+                      <span className="text-[9px] text-slate-500">Analyzed on {new Date().toLocaleDateString()}</span>
+                      <div className="analyst-stamp bg-navy-900/60 border border-navy-700">
+                        <div className={`contributor-badge w-5 h-5 bg-gradient-to-br ${assignedAnalyst.avatarColor}`}>
+                          {assignedAnalyst.initials}
+                        </div>
+                        <span className="text-slate-300">{assignedAnalyst.name}</span>
                       </div>
                     </div>
                   </div>
@@ -361,6 +378,37 @@ const ContractDetails = () => {
             >
               Start AI Chat Console
             </Link>
+          </div>
+
+          {/* Analysis Timeline Card */}
+          <div className="glass-card p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/20">
+                <Activity className="h-4 w-4" />
+              </div>
+              <h3 className="text-xs font-bold text-slate-100">Analysis History</h3>
+            </div>
+            
+            <div className="analysis-timeline">
+              {getSampleAnalysisHistory().map((item, idx) => (
+                <div key={idx} className="timeline-step">
+                  <div className={`timeline-avatar bg-gradient-to-br ${item.analyst.avatarColor}`}>
+                    {item.analyst.initials}
+                  </div>
+                  <div className="timeline-content w-full">
+                    <div className="timeline-content-label text-slate-100">
+                      {item.action}
+                    </div>
+                    <div className="text-[9px] text-slate-300 font-medium">
+                      {item.analyst.name}
+                    </div>
+                    <div className="timeline-content-time">
+                      {item.timestamp.toLocaleDateString()} at {item.timestamp.toLocaleTimeString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Side-by-Side Comparator Card */}
